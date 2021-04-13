@@ -150,9 +150,9 @@ set_banner(){
 	#							 #
 	##########################################################
 	
-	cat > /etc/issue.net << EOF
+	cat >> /etc/issue.net << EOF
 Toute utilisation non autorisée sera sévèrement punie 
-EOF 
+EOF
 	cp /etc/issue.net /etc/issue
 	figlet WIKI-COFFRE > /etc/motd
 }
