@@ -176,6 +176,8 @@ secure_grub(){
 	#							 #
 	##########################################################
 	path_grub=/boot/grub/grub.cfg
+	path_etc_grub=/etc/default/grub
+
 	cp $path_grub $path_grub.cfg
 
 	# Set User and Password 
@@ -183,6 +185,11 @@ secure_grub(){
 	echo "password.pbkdf2 mathieu">> $path_grub
 	echo "`echo -e "P@ssword\nP@ssword" | grub-mkpasswd-pbkdf2 2> /dev/null | awk -F" " '{ print $7 }'`" >> $path_grub
 
+
+	echo "GRUB_DISABLE_RECOVERY=\"true\"" >> $path_etc_grub
+	echo "GRUB_DISABLE_SUBMENU=y" >> $path_etc_grub 
+
+	update-grub
 }
 
 
