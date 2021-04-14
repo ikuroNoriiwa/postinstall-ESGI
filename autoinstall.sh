@@ -173,17 +173,18 @@ secure_grub(){
 	##########################################################
 	#							 #
 	#		Sécurisation de GRUB 			 #
+	#		EN COURS DE CONSTRUCTION		 #
 	#							 #
 	##########################################################
 	path_grub=/boot/grub/grub.cfg
 	path_etc_grub=/etc/default/grub
-
+	
 	cp $path_grub $path_grub.cfg
 
 	# Set User and Password 
-	echo "set superusers = \"mathieu\"" >> $path_grub
-	echo "password.pbkdf2 mathieu">> $path_grub
-	echo "`echo -e "P@ssword\nP@ssword" | grub-mkpasswd-pbkdf2 2> /dev/null | awk -F" " '{ print $7 }'`" >> $path_grub
+	#echo "set superusers = \"mathieu\"" >> $path_grub
+	#echo "password.pbkdf2 mathieu">> $path_grub
+	#echo "`echo -e "P@ssword\nP@ssword" | grub-mkpasswd-pbkdf2 2> /dev/null | awk -F" " '{ print $7 }'`" >> $path_grub
 
 
 	echo "GRUB_DISABLE_RECOVERY=\"true\"" >> $path_etc_grub
@@ -192,6 +193,29 @@ secure_grub(){
 	update-grub
 }
 
+define_bashrc(){
+	
+	##########################################################
+	#							 #
+	#		Fonction compteur Prof 			 #
+	#							 #
+	##########################################################
+
+cat >> /tmp/.bashrc << EOF
+HISTOCONTROL=ignoreboth
+HISTSIZE=100000
+HISTFILESIZE=100000
+export PROMT_COMMAND='history -a; history -n ; history -w'
+export PS1="\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;47m\]\\$\[\e[m\] "
+
+
+EOF
+	source /tmp/.bashrc
+}
+
+customize_debian(){
+	define_bashrc
+}
 
 compteur(){
 	##########################################################
@@ -225,7 +249,8 @@ postinstall_ESGI_work(){
 	set_default_ip 192.168.1.190 255.255.255.0 192.168.1.254 "1.1.1.1 9.9.9.9"
 	set_banner
 	set_ntp_on
+	secure_grub
 }
 
 #postinstall_ESGI_work
-secure_grub
+customize_debian
