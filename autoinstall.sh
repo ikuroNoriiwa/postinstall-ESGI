@@ -169,7 +169,45 @@ set_ntp_on(){
 	systemctl restart systemd-timesyncd
 }
 
+secure_grub(){
+	##########################################################
+	#							 #
+	#		Sécurisation de GRUB 			 #
+	#							 #
+	##########################################################
+	path_grub=/boot/grub/grub.cfg
+	cp $path_grub $path_grub.cfg
+
+	# Set User and Password 
+	echo "set superusers = \"mathieu\"" >> $path_grub
+	echo "password.pbkdf2 mathieu">> $path_grub
+	echo "`echo -e "P@ssword\nP@ssword" | grub-mkpasswd-pbkdf2 2> /dev/null | awk -F" " '{ print $7 }'`" >> $path_grub
+
+}
+
+
+compteur(){
+	##########################################################
+	#							 #
+	#		Fonction compteur Prof 			 #
+	#							 #
+	##########################################################
+
+	for i in $(seq 20);do
+		echo -n "$i"
+		sleep 1 
+	done 
+
+}
+
 postinstall_ESGI_work(){
+	# Quitter si Erreur 
+	set -e 
+	# Activer le mode debogage
+	# set -x 
+
+
+	# Mise en place machine ESGI 
 	packager 
 	create_ssh_key root
 	create_user esgi 10000 10000 P@ssword sudo
@@ -182,4 +220,5 @@ postinstall_ESGI_work(){
 	set_ntp_on
 }
 
-postinstall_ESGI_work
+#postinstall_ESGI_work
+secure_grub
