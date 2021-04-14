@@ -250,7 +250,14 @@ postinstall_ESGI_work(){
 	set_banner
 	set_ntp_on
 	secure_grub
+	customize_debian
+	rm -f /home/esgi/.bashrc
+	cp /tmp/.bashrc /home/esgi/ 
+	chown esgi /home/esgi/.bashrc
+	chgrp esgi /home/esgi/.bashrc 
+	chmod 770 /home/esgi/.bashrc
+	reboot 	
 }
 
-#postinstall_ESGI_work
-customize_debian
+postinstall_ESGI_work
+#customize_debian
