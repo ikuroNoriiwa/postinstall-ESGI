@@ -21,7 +21,7 @@ create_ssh_key(){
 		ssh_path=/home/$user/.ssh
 	fi 
 
-	if [[ ! -f $ssh_path ]]; then	
+	if [[ ! -e $ssh_path ]]; then	
 		mkdir -v $ssh_path
 	fi
 	chmod -v 700 $ssh_path
@@ -127,7 +127,7 @@ set_default_ip(){
 	interface=`ip -o link show | awk -F': ' '{print $2}' | grep -v lo`
 	sed -i 's/dhcp/static/' /etc/network/interfaces
 
-	cat >> /etc/network/interfaces.d/$interface << EOF
+	cat >> /etc/network/interfaces.d/ifcfg-$interface << EOF
 # Ajout de l'interface $interface
 allow-hotplug $interface
 iface $interface inet static
@@ -260,6 +260,7 @@ postinstall_ESGI_work(){
 	user=`cat /etc/passwd | grep 1000 | awk -F":" '{ print $1 }'`
 
 	# Mise en place machine ESGI 
+	hwclock --hctosys # met à l'heure du bios 
 	timedatectl set-timezone Europe/Paris
 	packager 
 	create_ssh_key root
