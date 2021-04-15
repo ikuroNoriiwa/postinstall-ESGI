@@ -138,8 +138,8 @@ iface $interface inet static
 	dns-nameservers $dns 
 EOF
 
-	ifdown $interface
-	ifup $interface
+	#ifdown $interface
+	#ifup $interface
 
 	systemctl -w net.ipv6.conf.$interface.disable_ipv6=1
 	
@@ -218,8 +218,11 @@ define_bashrc(){
 			ps1="\[\e[32;40m\]\u\[\e[m\] at \[\e[34m\]\h\[\e[m\] in \[\e[33m\]\w\[\e[m\] \d -\A \[\e[44m\]\\$\[\e[m\]  "
 		fi	
 	fi
+	
+	if [ -f $path ]; then
+		rm $path
+	fi
 
-	rm $path
 
 cat >> $path << EOF
 HISTOCONTROL=ignoreboth
