@@ -130,6 +130,7 @@ set_default_ip(){
 	cat >> /etc/network/interfaces.d/ifcfg-$interface << EOF
 # Ajout de l'interface $interface
 allow-hotplug $interface
+auto $interface
 iface $interface inet static
 	address $address
 	netmask $mask 
@@ -263,16 +264,21 @@ postinstall_ESGI_work(){
 	hwclock --hctosys # met à l'heure du bios 
 	timedatectl set-timezone Europe/Paris
 	packager 
+
 	create_ssh_key root
 	create_user esgi 10000 10000 P@ssword sudo
 	create_ssh_key esgi 
 	create_ssh_key $user
+
 	set_default_applications
+
 	config_ssh 
-	set_default_ip 192.168.1.190 255.255.255.0 192.168.1.254 "1.1.1.1 9.9.9.9"
-	set_banner
 	set_ntp_on
 	secure_grub
+
+	set_default_ip 192.168.1.190 255.255.255.0 192.168.1.254 "1.1.1.1 9.9.9.9"
+
+	set_banner
 	customize_debian
 
 	define_bashrc root
