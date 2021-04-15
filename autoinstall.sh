@@ -257,6 +257,21 @@ compteur(){
 
 }
 
+install_cheat(){
+	##########################################################
+	#							 #
+	#		Installation de cheat			 #
+	#							 #
+	##########################################################
+	
+	cheat_version="4.2.0"
+	cheat_type="cheat-linux-amd64"
+	apt install wget 
+	wget https://github.com/cheat/cheat/releases/download/$cheat_version/$cheat_type.gz
+	gzip -d $cheat_type.gz 
+	mv $cheat_type /usr/bin/cheat
+}
+
 postinstall_ESGI_work(){
 	# Quitter si Erreur 
 	set -e 
@@ -288,9 +303,11 @@ postinstall_ESGI_work(){
 	define_bashrc root
 	define_bashrc esgi
 	define_bashrc $first_user
-	
+
+	install_cheat	
 	reboot 	
 }
 
-postinstall_ESGI_work
+#postinstall_ESGI_work
 #customize_debian
+install_cheat
