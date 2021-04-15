@@ -141,7 +141,7 @@ EOF
 	#ifdown $interface
 	#ifup $interface
 
-	systemctl -w net.ipv6.conf.$interface.disable_ipv6=1
+	sysctl -w net.ipv6.conf.$interface.disable_ipv6=1
 	
 }
 
