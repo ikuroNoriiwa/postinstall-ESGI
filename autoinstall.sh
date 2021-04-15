@@ -20,8 +20,10 @@ create_ssh_key(){
 	else
 		ssh_path=/home/$user/.ssh
 	fi 
-	
-	mkdir -v $ssh_path
+
+	if [[ ! -f $ssh_path ]]; then	
+		mkdir -v $ssh_path
+	fi
 	chmod -v 700 $ssh_path
 	ssh-keygen -t ed25519 -f $ssh_path/id_ed25519 -q -N ""
 	chown -R $user:$user $ssh_path
@@ -44,9 +46,9 @@ packager(){
 	
 	# installation des paquets essentiels 
 	apt install -y mlocate rsync htop net-tools vim tmux screen zip pigz pixz \
-		       dstat iotop git psmisc tree lynx at postfix lshfw inxi figlet \ 
-	       		gdisk mc cifs-utils ntfs-3g sudo curl sshfs apt-file openssl \ 
-	       		gnupg2 dnsutils fish gpm grc ncdu p7zip-full parted
+		       dstat iotop git psmisc tree lynx at postfix lshw inxi figlet \
+		       gdisk mc cifs-utils ntfs-3g sudo curl sshfs apt-file openssl \
+		       gnupg2 dnsutils fish gpm grc ncdu p7zip-full parted
 
 	# Netoyage après installation 
 	apt autoremove -y
