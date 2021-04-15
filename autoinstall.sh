@@ -163,7 +163,7 @@ set_ntp_on(){
 	#	Activer le service NTP 				 #
 	#							 #
 	##########################################################
-
+	timedatectl set-timezone Europe/Paris
 	timedatectl set-ntp on 
 	systemctl status systemd-timesyncd
 	systemctl restart systemd-timesyncd
@@ -194,27 +194,46 @@ secure_grub(){
 }
 
 define_bashrc(){
-	
 	##########################################################
 	#							 #
 	#		Fonction compteur Prof 			 #
 	#							 #
 	##########################################################
+	
+	# Param1 = user 
+	user=$1
+	
+	if [ $user = 'root' ]; then 
+	       	path=/root/.bashrc
+		ps1="\[\e[31;40m\]\u\[\e[m\]@\[\e[34m\]\h\[\e[m\][\[\e[33m\]\w\[\e[m\]] \d -\A \[\e[33;41m\]\\$\[\e[m\]  "
+	else
+		path=/home/$user/.bashrc
+		if [[ "`groups $user`" == *"sudo"* ]]; then 
+			ps1="\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;47m\]\\$\[\e[m\] "
 
-cat >> /tmp/.bashrc << EOF
+		else
+			ps1="\[\e[32;40m\]\u\[\e[m\] at \[\e[34m\]\h\[\e[m\] in \[\e[33m\]\w\[\e[m\] \d -\A \[\e[44m\]\\$\[\e[m\]  "
+		fi	
+	fi
+
+	rm $path
+
+cat >> $path << EOF
 HISTOCONTROL=ignoreboth
 HISTSIZE=100000
 HISTFILESIZE=100000
 export PROMT_COMMAND='history -a; history -n ; history -w'
-export PS1="\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;47m\]\\$\[\e[m\] "
+export PS1="$ps1"
 
+alias ll="ls -las"
 
 EOF
-	source /tmp/.bashrc
+	chown $user:$user $path	
+	chmod 770 $path
 }
 
 customize_debian(){
-	define_bashrc
+	set_banner
 }
 
 compteur(){
@@ -236,14 +255,15 @@ postinstall_ESGI_work(){
 	set -e 
 	# Activer le mode debogage
 	# set -x 
-
+	user=`cat /etc/passwd | grep 1000 | awk -F":" '{ print $1 }'`
 
 	# Mise en place machine ESGI 
+	timedatectl set-timezone Europe/Paris
 	packager 
 	create_ssh_key root
 	create_user esgi 10000 10000 P@ssword sudo
 	create_ssh_key esgi 
-	create_ssh_key $USER
+	create_ssh_key $user
 	set_default_applications
 	config_ssh 
 	set_default_ip 192.168.1.190 255.255.255.0 192.168.1.254 "1.1.1.1 9.9.9.9"
@@ -251,11 +271,11 @@ postinstall_ESGI_work(){
 	set_ntp_on
 	secure_grub
 	customize_debian
-	rm -f /home/esgi/.bashrc
-	cp /tmp/.bashrc /home/esgi/ 
-	chown esgi /home/esgi/.bashrc
-	chgrp esgi /home/esgi/.bashrc 
-	chmod 770 /home/esgi/.bashrc
+
+	define_bashrc root
+	define_bashrc esgi
+	define_bashrc $user
+	
 	reboot 	
 }
 
