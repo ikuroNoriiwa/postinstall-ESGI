@@ -74,9 +74,10 @@ create_user(){
 	uid=$3
 	password=$4
 	admin=$5
+	shell=/bin/bash
 
 	groupadd -g $gid $username
-	useradd -u $uid -g $gid -m $username
+	useradd -u $uid -g $gid -m $username -s $shell
 	echo -e "$password\n$password" | passwd $username 
 
 	if [ $admin = sudo ]; then 
@@ -261,7 +262,7 @@ postinstall_ESGI_work(){
 	set -e 
 	# Activer le mode debogage
 	# set -x 
-	user=`cat /etc/passwd | grep 1000 | awk -F":" '{ print $1 }'`
+	first_user=`cat /etc/passwd | grep 1000 | awk -F":" '{ print $1 }'`
 
 	# Mise en place machine ESGI 
 	hwclock --hctosys # met à l'heure du bios 
@@ -271,7 +272,7 @@ postinstall_ESGI_work(){
 	create_ssh_key root
 	create_user esgi 10000 10000 P@ssword sudo
 	create_ssh_key esgi 
-	create_ssh_key $user
+	create_ssh_key $first_user
 
 	set_default_applications
 
@@ -286,7 +287,7 @@ postinstall_ESGI_work(){
 
 	define_bashrc root
 	define_bashrc esgi
-	define_bashrc $user
+	define_bashrc $first_user
 	
 	reboot 	
 }
