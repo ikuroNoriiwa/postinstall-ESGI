@@ -324,10 +324,15 @@ postinstall_ESGI_work(){
 	# set -x 
 
 	first_user=`cat /etc/passwd | grep 1000 | awk -F":" '{ print $1 }'`
-	ip=192.168.1.190
+	#ip=192.168.1.190
+	#mask=255.255.255.0
+	#gateway=192.168.1.254
+	#dns="1.1.1.1 9.9.9.9"
+
+	ip=10.0.2.16
 	mask=255.255.255.0
-	gateway=192.168.1.254
-	dns="1.1.1.1 9.9.9.9"
+	gateway=10.0.2.2
+	dns="192.168.1.1 1.1.1.1"
 
 	# Mise en place machine ESGI 
 	hwclock --hctosys # met à l'heure du bios 
