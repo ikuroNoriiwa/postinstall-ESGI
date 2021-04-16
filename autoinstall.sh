@@ -303,7 +303,7 @@ install_dropbear(){
 	#							 #
 	##########################################################
 
-	cle_publique=$1
+	cle_publique=`pwd`/$1
 
 	apt install dropbear busybox
 
@@ -316,9 +316,6 @@ install_dropbear(){
 
 	
 	cat $cle_publique >> /etc/dropbear-initramfs/authorized_keys	
-	i#cat >> /etc/dropbear-initramfs/authorized_keys << EOF
-#ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnamUeTjYj1xFCVjgH6y+EbKNYwj4r3QJsS+iCka/+Abo71hbXJjjjBpmRM/wEinPEoU1TNGAktKzGi9HFAZ9ZRinm0EA4VvQjgDasRsWD5QsWkh/U/gTEj6HO/v536jYA4BqqDMTnP56ZiMblL738GsM8E5zbvup2f9QBiL4/SwQhjnLviPZPf4hRCvygFAnTeZ11Rl3y9qckX4C32Brq3YsPW9Ar9WC+E1Y7mBUBxUpItGE1A9a1dg0+wDCPgaD1+laQpWLfsVKFXjqQKU5BWFHYz/msYDhVrdqbtSRBjxMU1TXag61zNnJuk/XvNMmyO9YHGZT3dolbdbzPHkkJ mathieu@debian
-#EOF
 
 	cd 
 	sed -i "s/NO_START=1/NO_START=0/g" /etc/default/dropbear
