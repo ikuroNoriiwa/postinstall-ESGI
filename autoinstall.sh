@@ -97,8 +97,8 @@ config_ssh(){
 
 	echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" >> /etc/ssh/sshd_config
-	chmod -v 640 /etc/ssh_config
-	chmod -v 640 /etc/sshd_config
+	chmod -v 640 /etc/ssh/ssh_config
+	chmod -v 640 /etc/ssh/sshd_config
 }
 
 set_default_applications(){
