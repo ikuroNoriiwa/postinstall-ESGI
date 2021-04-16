@@ -184,19 +184,26 @@ secure_grub(){
 	#		EN COURS DE CONSTRUCTION		 #
 	#							 #
 	##########################################################
-	path_grub=/boot/grub/grub.cfg
-	path_etc_grub=/etc/default/grub
 	
-	cp $path_grub $path_grub.cfg
-
-	# Set User and Password 
-	#echo "set superusers = \"mathieu\"" >> $path_grub
-	#echo "password.pbkdf2 mathieu">> $path_grub
-	#echo "`echo -e "P@ssword\nP@ssword" | grub-mkpasswd-pbkdf2 2> /dev/null | awk -F" " '{ print $7 }'`" >> $path_grub
-
-
 	echo "GRUB_DISABLE_RECOVERY=\"true\"" >> $path_etc_grub
 	echo "GRUB_DISABLE_SUBMENU=y" >> $path_etc_grub 
+
+
+	sed -i '$a set superusers="grub"' /etc/grub.d/40_custom
+	grub_mdp_hash=`echo -e "grub\ngrub" | grub-mkpasswd-pbkdf2 | grep grub | awk -F " " '{ print $7}'`
+
+	sed -i '$a password_pbkdf2 grub HASH' /etc/grub.d/40_custom
+	sed -i "/HASH/s/HASH/$grub_mdp_hash/" /etc/grub.d/40_custom
+
+	sed -i 's/--class os/--class os --unrestricted/g' /etc/grub.d/10_linux
+
+	##resolution
+	sed -i 's/quiet/vga=791/' /etc/default/grub
+	sed -i "/GRUB_GFXMODE/s/^#//" /etc/default/grub
+	sed -i "/GRUB_GFXMODE/s/640x480/1920x1080/" /etc/default/grub
+
+	##timeout
+	sed -i 's/=5/=20/' /etc/default/grub
 
 	update-grub
 }
@@ -293,7 +300,7 @@ install_cheat(){
 	
 	cheat_version="4.2.0"
 	cheat_type="cheat-linux-amd64"
-	apt install wget 
+	apt install wget
 	wget https://github.com/cheat/cheat/releases/download/$cheat_version/$cheat_type.gz
 	gzip -d $cheat_type.gz 
 	mv $cheat_type /usr/bin/cheat
@@ -310,7 +317,12 @@ postinstall_ESGI_work(){
 	set -e 
 	# Activer le mode debogage
 	# set -x 
+
 	first_user=`cat /etc/passwd | grep 1000 | awk -F":" '{ print $1 }'`
+	ip=192.168.1.190
+	mask=255.255.255.0
+	gateway=192.168.1.254
+	dns="1.1.1.1 9.9.9.9"
 
 	# Mise en place machine ESGI 
 	hwclock --hctosys # met à l'heure du bios 
@@ -344,4 +356,6 @@ postinstall_ESGI_work(){
 #postinstall_ESGI_work
 #customize_debian
 #install_cheat
-define_hostname 192.168.1.190
+#define_hostname 192.168.1.190
+
+secure_grub
