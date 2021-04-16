@@ -356,9 +356,9 @@ postinstall_ESGI_work(){
 	reboot 	
 }
 
-#postinstall_ESGI_work
+postinstall_ESGI_work
 #customize_debian
 #install_cheat
 #define_hostname 192.168.1.190
 
-secure_grub
+#secure_grub
