@@ -296,6 +296,26 @@ compteur(){
 
 }
 
+install_dropbear(){
+	
+	ip=$1
+	gateway=$2
+	netmask=$3
+	hostname=`hostname`
+
+	apt install dropbear-initramfs
+	echo "DROPBEAR_OPTION=\"-I 180 -j -k -p 2222 -s\"" >> /etc/dropbear-initramfs/config
+
+	echo "IP=$ip::$gateway:$netmask:$hostname" >> /etc/initramfs-tools/initramfs.conf
+
+	update-initramfs -u
+	update-initramfs -u -v
+
+
+
+
+}
+
 install_cheat(){
 	##########################################################
 	#							 #
@@ -360,7 +380,11 @@ postinstall_ESGI_work(){
 	define_bashrc $first_user
 	
 	define_hostname $ip
+
+	install_dropbear $ip $gateway $netmask
+
 	install_cheat	
+
 	reboot 	
 }
 
