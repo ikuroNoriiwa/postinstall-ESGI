@@ -308,11 +308,11 @@ install_dropbear(){
 	gateway=$3
 	mask=$4
 
-	apt install dropbear busybox
+	apt install dropbear busybox -y 
 
 	sed -i "s/BUSYBOX=auto/BUSYBOX=y/g" /etc/initramfs-tools/initramfs.conf
 	echo "DROPBEAR=y" >> /etc/initramfs-tools/initramfs.conf
-	echo "IP=$ip::$gateway:$mask:`hostname`" >> /etc/initrams-tools/initramfs.conf
+	echo "IP=$ip::$gateway:$mask:`hostname`" >> /etc/initramfs-tools/initramfs.conf
 	
 	cd /etc/dropbear-initramfs/
 	/usr/lib/dropbear/dropbearconvert dropbear openssh dropbear_rsa_host_key id_rsa
