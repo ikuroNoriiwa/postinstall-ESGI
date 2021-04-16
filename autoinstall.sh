@@ -186,7 +186,10 @@ secure_grub(){
 	#		EN COURS DE CONSTRUCTION		 #
 	#							 #
 	##########################################################
-	
+
+	path_grub=/boot/grub/grub.cfg
+	path_etc_grub=/etc/default/grub
+
 	echo "GRUB_DISABLE_RECOVERY=\"true\"" >> $path_etc_grub
 	echo "GRUB_DISABLE_SUBMENU=y" >> $path_etc_grub 
 
