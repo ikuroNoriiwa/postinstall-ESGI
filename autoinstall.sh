@@ -297,22 +297,23 @@ compteur(){
 }
 
 install_dropbear(){
-	
+	##########################################################
+	#							 #
+	#		installation de Dropbear		 #
+	#							 #
+	##########################################################
 	ip=$1
 	gateway=$2
 	netmask=$3
 	hostname=`hostname`
 
-	apt install dropbear-initramfs
+	apt install dropbear-initramfs -y
 	echo "DROPBEAR_OPTION=\"-I 180 -j -k -p 2222 -s\"" >> /etc/dropbear-initramfs/config
 
 	echo "IP=$ip::$gateway:$netmask:$hostname" >> /etc/initramfs-tools/initramfs.conf
 
 	update-initramfs -u
 	update-initramfs -u -v
-
-
-
 
 }
 
