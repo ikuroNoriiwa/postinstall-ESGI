@@ -239,6 +239,10 @@ export CHEAT_CONFIG_PATH="/etc/cheat/conf.yml"
 
 alias ll="ls -las"
 alias ip="ip -c"
+alias cp="cp -iv"
+alias mv="mv -iv"
+alias mkdir="mkdir -vp"
+alias rmdir="rmdir -vp"
 
 EOF
 	chown $user:$user $path	
@@ -260,8 +264,8 @@ define_hostname(){
 
 	old_hostname=`hostname`
 	hostnamectl set-hostname wiki.esgi.local
-	sed -i 's/$old_hostname/wiki.esgi.local		wiki/g' /etc/hosts
-	sed -i 's/127.0.0.1/$ip/' /etc/hosts
+	sed -i "s/$old_hostname/wiki.esgi.local		wiki/g" /etc/hosts
+	sed -i "s/127.0.0.1/$ip/" /etc/hosts
 
 } 
 
@@ -337,6 +341,7 @@ postinstall_ESGI_work(){
 	reboot 	
 }
 
-postinstall_ESGI_work
+#postinstall_ESGI_work
 #customize_debian
 #install_cheat
+define_hostname 192.168.1.190
