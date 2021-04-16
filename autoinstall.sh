@@ -46,10 +46,11 @@ packager(){
 	
 	# installation des paquets essentiels 
 	apt install -y mlocate rsync htop net-tools vim tmux screen zip pigz pixz \
-		       dstat iotop git psmisc tree lynx at postfix lshw inxi figlet \
+		       dstat iotop git psmisc tree lynx at lshw inxi figlet \
 		       gdisk mc cifs-utils ntfs-3g sudo curl sshfs apt-file openssl \
 		       gnupg2 dnsutils fish gpm grc ncdu p7zip-full parted
-
+	
+	update-db
 	# Netoyage après installation 
 	apt autoremove -y
 	apt clean -y 
@@ -83,6 +84,7 @@ create_user(){
 	if [ $admin = sudo ]; then 
 		usermod -aG sudo $username
 	fi 
+	chmod 700 /home/$user/
 }
 
 
@@ -95,6 +97,8 @@ config_ssh(){
 
 	echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" >> /etc/ssh/sshd_config
+	chmod -v 640 /etc/ssh_config
+	chmod -v 640 /etc/sshd_config
 }
 
 set_default_applications(){
@@ -169,7 +173,7 @@ set_ntp_on(){
 	##########################################################
 	timedatectl set-timezone Europe/Paris
 	timedatectl set-ntp on 
-	systemctl status systemd-timesyncd
+	#systemctl status systemd-timesyncd
 	systemctl restart systemd-timesyncd
 }
 
@@ -231,8 +235,10 @@ HISTSIZE=100000
 HISTFILESIZE=100000
 export PROMT_COMMAND='history -a; history -n ; history -w'
 export PS1="$ps1"
+export CHEAT_CONFIG_PATH="/etc/cheat/conf.yml"
 
 alias ll="ls -las"
+alias ip="ip -c"
 
 EOF
 	chown $user:$user $path	
@@ -242,6 +248,23 @@ EOF
 customize_debian(){
 	set_banner
 }
+
+define_hostname(){
+	##########################################################
+	#							 #
+	#		Definis le hostname 			 #
+	#							 #
+	##########################################################
+	
+	ip=$1
+
+	old_hostname=`hostname`
+	hostnamectl set-hostname wiki.esgi.local
+	sed -i 's/$old_hostname/wiki.esgi.local		wiki/g' /etc/hosts
+	sed -i 's/127.0.0.1/$ip/' /etc/hosts
+
+} 
+
 
 compteur(){
 	##########################################################
@@ -270,6 +293,12 @@ install_cheat(){
 	wget https://github.com/cheat/cheat/releases/download/$cheat_version/$cheat_type.gz
 	gzip -d $cheat_type.gz 
 	mv $cheat_type /usr/bin/cheat
+	chmod +x /usr/bin/cheat
+
+	mkdir -pv /etc/cheat
+
+	chmod -R 731 /etc/cheat
+	
 }
 
 postinstall_ESGI_work(){
@@ -308,6 +337,6 @@ postinstall_ESGI_work(){
 	reboot 	
 }
 
-#postinstall_ESGI_work
+postinstall_ESGI_work
 #customize_debian
-install_cheat
+#install_cheat
