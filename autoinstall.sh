@@ -130,7 +130,9 @@ set_default_ip(){
 	dns=$4
 
 	interface=`ip -o link show | awk -F': ' '{print $2}' | grep -v lo`
-	sed -i 's/dhcp/static/' /etc/network/interfaces
+	#sed -i 's/dhcp/static/' /etc/network/interfaces
+	mv /etc/network/interfaces /etc/network/interfaces.old
+	sed "/$interface/d" /etc/network/interfaces.old >> /etc/network/interfaces
 
 	cat >> /etc/network/interfaces.d/ifcfg-$interface << EOF
 # Ajout de l'interface $interface
@@ -143,8 +145,8 @@ iface $interface inet static
 	dns-nameservers $dns 
 EOF
 
-	#ifdown $interface
-	#ifup $interface
+	ifdown $interface
+	ifup $interface
 
 	sysctl -w net.ipv6.conf.$interface.disable_ipv6=1
 	
@@ -340,7 +342,7 @@ postinstall_ESGI_work(){
 	set_ntp_on
 	secure_grub
 
-	set_default_ip 192.168.1.190 255.255.255.0 192.168.1.254 "1.1.1.1 9.9.9.9"
+	set_default_ip $ip $mask $gateway $dns
 
 	set_banner
 	customize_debian
@@ -348,7 +350,8 @@ postinstall_ESGI_work(){
 	define_bashrc root
 	define_bashrc esgi
 	define_bashrc $first_user
-
+	
+	define_hostname $ip
 	install_cheat	
 	reboot 	
 }
