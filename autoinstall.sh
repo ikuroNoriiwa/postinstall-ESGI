@@ -304,11 +304,15 @@ install_dropbear(){
 	##########################################################
 
 	cle_publique=`pwd`/$1
+	ip=$2
+	gateway=$3
+	mask=$4
 
 	apt install dropbear busybox
 
 	sed -i "s/BUSYBOX=auto/BUSYBOX=y/g" /etc/initramfs-tools/initramfs.conf
 	echo "DROPBEAR=y" >> /etc/initramfs-tools/initramfs.conf
+	echo "IP=$ip::$gateway:$mask:`hostname`" >> /etc/initrams-tools/initramfs.conf
 	
 	cd /etc/dropbear-initramfs/
 	/usr/lib/dropbear/dropbearconvert dropbear openssh dropbear_rsa_host_key id_rsa
@@ -389,18 +393,18 @@ postinstall_ESGI_work(){
 	
 	define_hostname $ip
 
-	install_dropbear $ip $gateway $netmask
+	install_dropbear intel_nuc_debian.pub $ip $gateway $netmask
 
 	install_cheat	
 
 	reboot 	
 }
 
-#postinstall_ESGI_work
+postinstall_ESGI_work
 #customize_debian
 #install_cheat
 #define_hostname 192.168.1.190
 
 #secure_grub
-install_dropbear intel_nuc_debian.pub
+#install_dropbear intel_nuc_debian.pub
 
