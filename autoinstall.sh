@@ -328,6 +328,26 @@ install_dropbear(){
 	systemctl disable dropbear
 }
 
+
+setup_coffre(){
+	##########################################################
+	#							 #
+	#		Setup Coffre :)				 #
+	#							 #
+	##########################################################
+
+	user=$1
+
+	umount -v /home/$user/COFFRE
+	echo -e "YES\nP@ssword\nP@ssword" | cryptsetup luksFormat /dev/VGCRYPT/lv_coffre
+
+	mv /etc/fstab /etc/fstab.old
+	sed "/COFFRE/d"/etc/fstab.old > /etc/fstab
+	echo "P@ssword" | cryptsetup luksOpen /dev/VGCRYPT/lv_coffre lv_coffrecrypt
+	mkfs.btrfs /dev/mapper/lv_coffrecrypt
+
+}
+
 install_cheat(){
 	##########################################################
 	#							 #
