@@ -50,7 +50,7 @@ packager(){
 		       gdisk mc cifs-utils ntfs-3g sudo curl sshfs apt-file openssl \
 		       gnupg2 dnsutils fish gpm grc ncdu p7zip-full parted
 	
-	update-db
+	updatedb
 	# Netoyage après installation 
 	apt autoremove -y
 	apt clean -y 
@@ -84,7 +84,7 @@ create_user(){
 	if [ $admin = sudo ]; then 
 		usermod -aG sudo $username
 	fi 
-	chmod 700 /home/$user/
+	chmod 700 /home/$username/
 }
 
 
