@@ -302,23 +302,29 @@ install_dropbear(){
 	#		installation de Dropbear		 #
 	#							 #
 	##########################################################
-	# Param1 = ip adresse
-	# Param2 = gateway
-	# Param3 = netmask
+
+	cle_publique=$1
+
+	apt install dropbear busybox
+
+	sed -i "s/BUSYBOX=auto/BUSYBOX=y/g" /etc/initramfs-tools/initramfs.conf
+	echo "DROPBEAR=y" >> /etc/initramfs-tools/initramfs.conf
 	
-	ip=$1
-	gateway=$2
-	netmask=$3
-	hostname=`hostname`
+	cd /etc/dropbear-initramfs/
+	/usr/lib/dropbear/dropbearconvert dropbear openssh dropbear_rsa_host_key id_rsa
+	dropbearkey -y -f dropbear_rsa_host_key | grep "^ssh-rsa " > id_rsa.pub
 
-	apt install dropbear-initramfs -y
-	echo "DROPBEAR_OPTION=\"-I 180 -j -k -p 2222 -s\"" >> /etc/dropbear-initramfs/config
+	
+	cat $cle_publique >> /etc/dropbear-initramfs/authorized_keys	
+	i#cat >> /etc/dropbear-initramfs/authorized_keys << EOF
+#ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnamUeTjYj1xFCVjgH6y+EbKNYwj4r3QJsS+iCka/+Abo71hbXJjjjBpmRM/wEinPEoU1TNGAktKzGi9HFAZ9ZRinm0EA4VvQjgDasRsWD5QsWkh/U/gTEj6HO/v536jYA4BqqDMTnP56ZiMblL738GsM8E5zbvup2f9QBiL4/SwQhjnLviPZPf4hRCvygFAnTeZ11Rl3y9qckX4C32Brq3YsPW9Ar9WC+E1Y7mBUBxUpItGE1A9a1dg0+wDCPgaD1+laQpWLfsVKFXjqQKU5BWFHYz/msYDhVrdqbtSRBjxMU1TXag61zNnJuk/XvNMmyO9YHGZT3dolbdbzPHkkJ mathieu@debian
+#EOF
 
-	echo "IP=$ip::$gateway:$netmask:$hostname" >> /etc/initramfs-tools/initramfs.conf
-
-	update-initramfs -u
-	update-initramfs -u -v
-
+	cd 
+	sed -i "s/NO_START=1/NO_START=0/g" /etc/default/dropbear
+	echo "DROPBEAR_OPTIONS=\"-p 21\"" >> /etc/dropbear-initramfs/config
+       	update-initramfs -u 
+	systemctl disable dropbear
 }
 
 install_cheat(){
@@ -393,9 +399,11 @@ postinstall_ESGI_work(){
 	reboot 	
 }
 
-postinstall_ESGI_work
+#postinstall_ESGI_work
 #customize_debian
 #install_cheat
 #define_hostname 192.168.1.190
 
 #secure_grub
+install_dropbear intel_nuc_debian.pub
+
