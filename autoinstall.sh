@@ -265,7 +265,7 @@ define_hostname(){
 	old_hostname=`hostname`
 	hostnamectl set-hostname wiki.esgi.local
 	sed -i "s/$old_hostname/wiki.esgi.local		wiki/g" /etc/hosts
-	sed -i "s/127.0.0.1/$ip/" /etc/hosts
+	sed -i "s/127.0.1.1/$ip/" /etc/hosts
 
 } 
 
