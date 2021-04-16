@@ -302,6 +302,10 @@ install_dropbear(){
 	#		installation de Dropbear		 #
 	#							 #
 	##########################################################
+	# Param1 = ip adresse
+	# Param2 = gateway
+	# Param3 = netmask
+	
 	ip=$1
 	gateway=$2
 	netmask=$3
@@ -350,9 +354,9 @@ postinstall_ESGI_work(){
 	#gateway=192.168.1.254
 	#dns="1.1.1.1 9.9.9.9"
 
-	ip=10.0.2.16
+	ip=192.168.1.200
 	mask=255.255.255.0
-	gateway=10.0.2.2
+	gateway=192.168.1.1
 	dns="192.168.1.1 1.1.1.1"
 
 	# Mise en place machine ESGI 
