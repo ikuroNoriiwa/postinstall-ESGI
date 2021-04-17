@@ -355,7 +355,9 @@ install_cheat(){
 	#		Installation de cheat			 #
 	#							 #
 	##########################################################
-	
+	# Param1 : user propriétaire des cheats 
+	user=$1
+
 	cheat_version="4.2.0"
 	cheat_type="cheat-linux-amd64"
 	apt install wget
@@ -367,6 +369,25 @@ install_cheat(){
 	mkdir -pv /etc/cheat
 
 	chmod -R 731 /etc/cheat
+
+
+	cat >>  /etc/cheat/conf.yml << EOF
+editor: vim
+colorize: true
+style: monokai
+formatter: terminal16m
+
+cheatpaths:
+ - name: community
+   path: /home/$user/.config/cheat/cheatsheets/community
+   tags: [ community ] 
+   readonly: true
+
+ - name: personal
+   path: /home/$user/.config/cheat/cheatsheets/personal
+   tags: [ community ] 
+   readonly: false 
+EOF
 	
 }
 
@@ -416,16 +437,11 @@ postinstall_ESGI_work(){
 
 	install_dropbear intel_nuc_debian.pub $ip $gateway $netmask
 
-	install_cheat	
+	setup_coffre $first_user
+	install_cheat $first_user 
 
 	reboot 	
 }
 
 postinstall_ESGI_work
-#customize_debian
-#install_cheat
-#define_hostname 192.168.1.190
-
-#secure_grub
-#install_dropbear intel_nuc_debian.pub
 
