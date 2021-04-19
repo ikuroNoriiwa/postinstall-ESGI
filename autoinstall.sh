@@ -464,7 +464,7 @@ install_cheat(){
 
 	mkdir -pv /etc/cheat
 
-	chmod -R 731 /etc/cheat
+	chmod -R 755 /etc/cheat
 
 
 	cat >>  /etc/cheat/conf.yml << EOF
