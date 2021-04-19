@@ -288,7 +288,7 @@ define_bashrc(){
 	##########################################################
 	
 	# Param1 = user 
-
+	# Param2 = user créé à l'installation
 	echo "\n\n###############################################################"
 	echo "#								    #"
 	echo "#	     			Setup Bashrc			    #"
@@ -296,6 +296,7 @@ define_bashrc(){
 	echo "###############################################################"
 
 	user=$1
+	first_user=$2
 	
 	if [ $user = 'root' ]; then 
 	       	path=/root/.bashrc
@@ -326,7 +327,7 @@ HISTSIZE=100000
 HISTFILESIZE=100000
 export PROMT_COMMAND='history -a; history -n ; history -w'
 export PS1="$ps1"
-export CHEAT_CONFIG_PATH="/etc/cheat/conf.yml"
+export CHEAT_CONFIG_PATH="/home/$first_user/COFFRE/MEMENTO/conf.yml"
 
 alias ll="ls -las"
 alias ip="ip -c"
@@ -441,6 +442,25 @@ setup_coffre(){
 	echo "P@ssword" | cryptsetup luksOpen /dev/VGCRYPT/lv_coffre lv_coffrecrypt
 	mkfs.btrfs /dev/mapper/lv_coffrecrypt
 
+	mount /dev/mapper/lv_coffrecrypt /home/$user/COFFRE
+	mkdir -vp /home/$user/COFFRE/CERTIFICAT
+	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/bash
+	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/ksh
+	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/zsh
+	mkdir -vp /home/$user/COFFRE/MEMENTO/cheat
+	mkdir -vp /home/$user/COFFRE/SECURITE/fail2ban
+	mkdir -vp /home/$user/COFFRE/SECURITE/firewall
+	mkdir -vp /home/$user/COFFRE/SECURITE/supervision
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/APPLIS/bookstack
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/APPLIS/mysql
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/php
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/php-fpm
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/apache
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/bind
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/nginx
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/rsyslog
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/ssh
+
 }
 
 install_cheat(){
@@ -464,7 +484,11 @@ install_cheat(){
 	apt install wget
 	wget https://github.com/cheat/cheat/releases/download/$cheat_version/$cheat_type.gz
 	gzip -d $cheat_type.gz 
+
 	mv $cheat_type /usr/bin/cheat
+	cp /usr/bin/cheat /home/$user/COFFRE/MEMENTO/cheat/cheat
+
+	chmod +x /home/$user/COFFRE/MEMENTO/cheat/cheat
 	chmod +x /usr/bin/cheat
 
 	mkdir -pv /etc/cheat
@@ -480,12 +504,12 @@ formatter: terminal16m
 
 cheatpaths:
  - name: community
-   path: /home/$user/.config/cheat/cheatsheets/community
+   path: /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/community
    tags: [ community ] 
    readonly: true
 
  - name: personal
-   path: /home/$user/.config/cheat/cheatsheets/personal
+   path: /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/personal
    tags: [ community ] 
    readonly: false 
 EOF
@@ -530,9 +554,9 @@ postinstall_ESGI_work(){
 	set_banner
 	customize_debian
 
-	define_bashrc root
-	define_bashrc esgi
-	define_bashrc $first_user
+	define_bashrc root $first_user
+	define_bashrc esgi $first_user
+	define_bashrc $first_user $first_user
 	
 	define_hostname $ip
 
