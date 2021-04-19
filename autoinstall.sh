@@ -346,15 +346,22 @@ setup_coffre(){
 	##########################################################
 
 	user=$1
-
+	
+	echo "\n\numount"
 	umount -v /home/$user/COFFRE
 	#echo -e "YES\nP@ssword\nP@ssword" | cryptsetup luksFormat /dev/VGCRYPT/lv_coffre
+	echo "cryptsetup"
 	echo "YES" | echo "P@ssword" | echo "P@ssword" | cryptsetup luksFormat /dev/VGCRYPT/lv_coffre 
-
+	
+	echo "mv fstab"
 	mv /etc/fstab /etc/fstab.old
+	echo "sed coffre"
 	sed "/COFFRE/d"/etc/fstab.old > /etc/fstab
+	echo "luksopen"
 	echo "P@ssword" | cryptsetup luksOpen /dev/VGCRYPT/lv_coffre lv_coffrecrypt
+	echo "mkfs"
 	mkfs.btrfs /dev/mapper/lv_coffrecrypt
+	echo "Done"
 
 }
 
