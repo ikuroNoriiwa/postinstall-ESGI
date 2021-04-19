@@ -283,7 +283,7 @@ secure_grub(){
 define_bashrc(){
 	##########################################################
 	#							 #
-	#		Fonction compteur Prof 			 #
+	#			Set Bashrc 			 #
 	#							 #
 	##########################################################
 	
@@ -308,6 +308,11 @@ define_bashrc(){
 		else
 			ps1="\[\e[32;40m\]\u\[\e[m\] at \[\e[34m\]\h\[\e[m\] in \[\e[33m\]\w\[\e[m\] \d -\A \[\e[44m\]\\$\[\e[m\]  "
 		fi	
+
+		if [ ! -f /home/$user/.bash_profile ]; then
+			echo -e "if [ -f ~/.bashrc ]; then\n	. ~/.bashrc\nfi" >> /home/$user/.bash_profile
+		fi
+
 	fi
 	
 	if [ -f $path ]; then
