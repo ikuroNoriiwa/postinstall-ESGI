@@ -22,6 +22,12 @@ create_ssh_key(){
 
 	# Param1 = nom d'utilisateur
 
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#		Create SSH key for user $1			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
+
 	user=$1 
 	
 	if [ $user = "root" ]; then 
@@ -45,6 +51,16 @@ packager(){
 	#	Gestion des paquets (Clean & Install)		 #
 	#							 #
 	##########################################################
+
+
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#				Setup Packages			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
+
+	hwclock --hctosys # met à l'heure du bios 
+	timedatectl set-timezone Europe/Paris
 
 	# Mise à jour des paquets 
 	apt update -y 
@@ -79,6 +95,12 @@ create_user(){
 	# Param4 = Mot de passe 
 	# Param5 = sudo / nosudo
 
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#			Create User $1				    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
+
 	username=$1
 	gid=$2
 	uid=$3
@@ -104,6 +126,12 @@ config_ssh(){
 	#							 #
 	##########################################################
 
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#				Config SSH			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
+
 	echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 	echo "Banner /etc/issue.net" >> /etc/ssh/sshd_config
 	chmod -v 640 /etc/ssh/ssh_config
@@ -116,6 +144,12 @@ set_default_applications(){
 	# 	Définitions des applications par défaut	 	 #
 	#							 #
 	##########################################################
+
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#			Setup Default Applications		    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
 
 	ln -sfn /usr/bin/vim.basic /etc/alternatives/editor
 
@@ -132,6 +166,12 @@ set_default_ip(){
 	# Param2 = netmask 
 	# Param3 = gateway 
 	# Param4 = dns serveurs 
+
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     		Setup Static IP : $1			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
 
 	address=$1
 	mask=$2
@@ -169,6 +209,12 @@ set_banner(){
 	#							 #
 	##########################################################
 	
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     			Setup Banner			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
+
 	cat >> /etc/issue.net << EOF
 Toute utilisation non autorisée sera sévèrement punie 
 EOF
@@ -182,9 +228,15 @@ set_ntp_on(){
 	#	Activer le service NTP 				 #
 	#							 #
 	##########################################################
+
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     			Setup NTP			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
+
 	timedatectl set-timezone Europe/Paris
 	timedatectl set-ntp on 
-	#systemctl status systemd-timesyncd
 	systemctl restart systemd-timesyncd
 }
 
@@ -195,6 +247,12 @@ secure_grub(){
 	#		EN COURS DE CONSTRUCTION		 #
 	#							 #
 	##########################################################
+
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     			Secure GRUB			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
 
 	path_grub=/boot/grub/grub.cfg
 	path_etc_grub=/etc/default/grub
@@ -230,6 +288,13 @@ define_bashrc(){
 	##########################################################
 	
 	# Param1 = user 
+
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     			Setup Bashrc			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
+
 	user=$1
 	
 	if [ $user = 'root' ]; then 
@@ -281,6 +346,11 @@ define_hostname(){
 	#							 #
 	##########################################################
 	
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     			Set Hostname Wiki		    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
 	ip=$1
 
 	old_hostname=`hostname`
@@ -312,6 +382,11 @@ install_dropbear(){
 	#							 #
 	##########################################################
 
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     			Setup Dropbear			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
 	cle_publique=`pwd`/$1
 	ip=$2
 	gateway=$3
@@ -345,6 +420,11 @@ setup_coffre(){
 	#							 #
 	##########################################################
 
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     			Setup COFFRE 			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
 	user=$1
 	
 	umount -v /home/$user/COFFRE
@@ -365,6 +445,13 @@ install_cheat(){
 	#							 #
 	##########################################################
 	# Param1 : user propriétaire des cheats 
+
+	echo "\n\n###############################################################"
+	echo "#								    #"
+	echo "#	     			Install Cheat 			    #"
+	echo "#							    	    #"	
+	echo "###############################################################"
+
 	user=$1
 
 	cheat_version="4.2.0"
@@ -418,9 +505,8 @@ postinstall_ESGI_work(){
 	gateway=192.168.1.1
 	dns="192.168.1.1 1.1.1.1"
 
-	# Mise en place machine ESGI 
-	hwclock --hctosys # met à l'heure du bios 
-	timedatectl set-timezone Europe/Paris
+	# Mise en place machine ESGI
+
 	packager 
 
 	create_ssh_key root
