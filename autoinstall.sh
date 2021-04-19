@@ -4,6 +4,15 @@
 # Auteur : Mathieu NOYELLE
 # contact : mathieu@noyelle.pro
 
+print_header(){
+echo "             _                _ _    _   _ "
+echo "  __ _ _   _| |_ _____      _(_) | _(_) | |"
+echo " / _\` | | | | __/ _ \\ \\ /\\ / / | |/ / | | |"
+echo "| (_| | |_| | || (_) \ V  V /| |   <| | |_|"
+echo " \__,_|\__,_|\__\___/ \_/\_/ |_|_|\_\_| (_)"
+
+}
+
 create_ssh_key(){
 	##########################################################
 	#							 #
@@ -396,6 +405,7 @@ postinstall_ESGI_work(){
 	set -e 
 	# Activer le mode debogage
 	# set -x 
+	print_header
 
 	first_user=`cat /etc/passwd | grep 1000 | awk -F":" '{ print $1 }'`
 	#ip=192.168.1.190
@@ -444,4 +454,4 @@ postinstall_ESGI_work(){
 }
 
 postinstall_ESGI_work
-
+#print_header
