@@ -516,6 +516,24 @@ EOF
 	
 }
 
+install_nginx(){
+	apt install nginx -y
+
+	systemctl stop nginx.service
+	systemctl start nginx.service
+	systemctl enable gninx.service
+}
+
+install_mariadb(){
+	apt install mariadb-server mariadb-client
+
+	systemctl stop mariadb.service
+	systemctl start mariadb.service
+	systemctl enable mariadb.service
+
+	echo -e "Y\npassword\npassword\nY\nY\nY\nY" | mysql_secure_installation
+}
+
 postinstall_ESGI_work(){
 	# Quitter si Erreur 
 	set -e 
