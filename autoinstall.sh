@@ -516,7 +516,7 @@ cheatpaths:
 EOF
 	cd /tmp/
 	git clone https://github.com/cheat/cheatsheets
-	mv /tmp/community/* /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/community
+	mv /tmp/cheatsheets/* /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/community
 
 	
 }
