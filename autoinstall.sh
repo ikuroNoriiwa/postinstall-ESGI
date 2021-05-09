@@ -447,7 +447,8 @@ setup_coffre(){
 	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/bash
 	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/ksh
 	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/zsh
-	mkdir -vp /home/$user/COFFRE/MEMENTO/cheat
+	mkdir -vp /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/community 
+	mkdir -vp /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/personal 
 	mkdir -vp /home/$user/COFFRE/SECURITE/fail2ban
 	mkdir -vp /home/$user/COFFRE/SECURITE/firewall
 	mkdir -vp /home/$user/COFFRE/SECURITE/supervision
@@ -510,9 +511,13 @@ cheatpaths:
 
  - name: personal
    path: /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/personal
-   tags: [ community ] 
+   tags: [ personal ] 
    readonly: false 
 EOF
+	cd /tmp/
+	git clone https://github.com/cheat/cheatsheets
+	mv /tmp/community/* /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/community
+
 	
 }
 
@@ -525,13 +530,23 @@ install_nginx(){
 }
 
 install_mariadb(){
-	apt install mariadb-server mariadb-client
+	apt install -y mariadb-server mariadb-client
 
 	systemctl stop mariadb.service
 	systemctl start mariadb.service
 	systemctl enable mariadb.service
 
 	echo -e "Y\npassword\npassword\nY\nY\nY\nY" | mysql_secure_installation
+}
+
+install_php(){
+	version=7.1
+	apt install -y software-properties-common
+	add-apt-repository ppa:ondrej/php
+
+	apt update -y
+
+	apt install php$version-fpm
 }
 
 postinstall_ESGI_work(){
