@@ -532,12 +532,14 @@ chroot_default_user(){
 
 	user=$1
         apps="/usr/bin/mount /usr/bin/bash /usr/sbin/cryptsetup"	
+
 	mkdir /home/CHROOT
+	chmod 755 /home/CHROOT
 
 	for app in $apps; do 
-		rsync -Ra $app /home/CHROOT/$app
+		rsync -Ra $app /home/CHROOT
+		echo "`ldd $app`"
 	done
-	#mkdir /home/CHROOT
 
 }
 
