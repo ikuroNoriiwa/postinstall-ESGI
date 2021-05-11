@@ -582,7 +582,8 @@ install_mariadb(){
 	echo -e "Y\n$DB_PASS\n$DB_PASS\nY\nY\nY\nY" | mysql_secure_installation
 	mysql -u root --execute="CREATE DATABASE bookstack;"
 	mysql -u root --execute="CREATE USER 'bookstack'@'localhost' IDENTIFIED BY '$DB_PASS';"
-	mysql -u root --execute="GRANT ALL ON bookstack.* TO 'bookstack'@'localhost';FLUSH PRIVILEGES;"}
+	mysql -u root --execute="GRANT ALL ON bookstack.* TO 'bookstack'@'localhost';FLUSH PRIVILEGES;"
+}
 
 install_php(){
 	version=7.3
@@ -596,6 +597,9 @@ install_bookstack(){
 	install_php
 
 	apt install composer -y
+
+	cd /var/www
+
 	git clone https://github.com/BookStackApp/BookStack.git --branch release --single-branch
 	cd BookStack
 	composer install --no-dev
@@ -605,7 +609,7 @@ install_bookstack(){
 	sed -i.bak 's/DB_USERNAME=.*$/DB_USERNAME=bookstack/' .env
 	sed -i.bak "s/DB_PASSWORD=.*\$/DB_PASSWORD=$DB_PASS/" .env
 	php artisan key:generate --no-interaction --force
-	php artisan migrate 
+	echo -e "Y\n" | php artisan migrate 
 
 	
 cat >> /etc/nginx/sites-available/bookstack.conf << EOF
@@ -615,28 +619,28 @@ server {
 
 	server_name wiki.esgi.local;
 
-	root/var/www/bookstack/public;
+	root /var/www/BookStack/public;
 
 	index index.php index.html;
 
 	location / {
-		try_files $uri $uri/ /index.php?$query_string;
+		try_files \$uri \$uri/ /index.php?\$query_string;
 	}
 
 	location ~ \.php$ { 
 		fastcgi_index index.php;
-		try_files $uri =404;
+		try_files \$uri =404;
 		include fastcgi_params; 
-		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
 		fastcgi_pass unix:/run/php/php7.3-fpm.sock;
 	}
 }
 
 EOF
-	mkdir -vp /etc/nginx/sites-available/bookstack
+	#mkdir -vp /etc/nginx/sites-available/bookstack
 	ln -s /etc/nginx/sites-available/bookstack.conf /etc/nginx/sites-enabled/
 
-
+	chown -R www-data:www-data /var/www/BookStack
 	systemctl stop nginx.service
 	systemctl start nginx.service
 	systemctl enable nginx.service
