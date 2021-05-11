@@ -444,23 +444,11 @@ setup_coffre(){
 
 	mount /dev/mapper/lv_coffrecrypt /home/$user/COFFRE
 	mkdir -vp /home/$user/COFFRE/CERTIFICAT
-	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/bash
-	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/ksh
-	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/zsh
-	mkdir -vp /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/community 
-	mkdir -vp /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/personal 
-	mkdir -vp /home/$user/COFFRE/SECURITE/fail2ban
-	mkdir -vp /home/$user/COFFRE/SECURITE/firewall
-	mkdir -vp /home/$user/COFFRE/SECURITE/supervision
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/APPLIS/bookstack
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/APPLIS/mysql
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/php
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/php-fpm
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/apache
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/bind
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/nginx
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/rsyslog
-	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/ssh
+	mkdir -vp /home/$user/COFFRE/ENVIRONNEMENT/{bash,ksh,zsh}
+	mkdir -vp /home/$user/COFFRE/MEMENTO/cheat/cheatsheets/{community,personal} 
+	mkdir -vp /home/$user/COFFRE/SECURITE/{fail2ban,firewall,supervision}
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/APPLIS/{BookStack,mysql}
+	mkdir -vp /home/$user/COFFRE/SERVEUR/DEBIAN10/TEMPLATES/{php,php-fpm,apache,bind,nginx,rsyslog,ssh}
 
 }
 
@@ -585,18 +573,66 @@ install_nginx(){
 
 install_mariadb(){
 	apt install -y mariadb-server mariadb-client
+	DB_PASS="password"
 
 	systemctl stop mariadb.service
 	systemctl start mariadb.service
 	systemctl enable mariadb.service
 
-	echo -e "Y\npassword\npassword\nY\nY\nY\nY" | mysql_secure_installation
-}
+	echo -e "Y\n$DB_PASS\n$DB_PASS\nY\nY\nY\nY" | mysql_secure_installation
+	mysql -u root --execute="CREATE DATABASE bookstack;"
+	mysql -u root --execute="CREATE USER 'bookstack'@'localhost' IDENTIFIED BY '$DB_PASS';"
+	mysql -u root --execute="GRANT ALL ON bookstack.* TO 'bookstack'@'localhost';FLUSH PRIVILEGES;"}
 
 install_php(){
 	version=7.3
 
-	apt install php$version-fpm php$version-mbstring php$version-curl php$version-mysql php$version-gd php-tokenizer -y
+	apt install php$version-fpm php$version-mbstring php$version-curl php$version-mysql php$version-gd php$version-xml php-tokenizer -y
+}
+
+install_bookstack(){
+	install_nginx
+	install_mariadb
+	install_php
+
+	apt install composer -y
+	git clone https://github.com/BookStackApp/BookStack.git --branch release --single-branch
+	cd BookStack
+	composer install --no-dev
+	cp .env.example .env
+	sed -i.bak "s@APP_URL=.*\$@APP_URL=http://$DOMAIN@" .env
+	sed -i.bak 's/DB_DATABASE=.*$/DB_DATABASE=bookstack/' .env
+	sed -i.bak 's/DB_USERNAME=.*$/DB_USERNAME=bookstack/' .env
+	sed -i.bak "s/DB_PASSWORD=.*\$/DB_PASSWORD=$DB_PASS/" .env
+	php artisan key:generate --no-interaction --force
+	php artisan migrate 
+
+	
+cat >> /home/CHROOT/home/mathieu/.profile << EOF
+server { 
+	listen 80;
+	listen [::]:80;
+
+	server_name wiki.esgi.local;
+
+	root/var/www/bookstack/public;
+
+	index index.php index.html;
+
+	location / {
+		try_files $uri $uri/ /index.php?$query_string;
+	}
+
+	location ~ \.php$ { 
+		fastcgi_index index.php;
+		try_files $uri =404;
+		include fastcgi_params; 
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+	}
+}
+
+EOF
 }
 
 postinstall_ESGI_work(){
@@ -653,4 +689,6 @@ postinstall_ESGI_work(){
 
 #postinstall_ESGI_work
 #print_header
-chroot_default_user mathieu
+#chroot_default_user mathieu
+
+install_bookstack
