@@ -608,7 +608,7 @@ install_bookstack(){
 	php artisan migrate 
 
 	
-cat >> /home/CHROOT/home/mathieu/.profile << EOF
+cat >> /etc/nginx/sites-available/bookstack.conf << EOF
 server { 
 	listen 80;
 	listen [::]:80;
@@ -633,6 +633,14 @@ server {
 }
 
 EOF
+	mkdir -vp /etc/nginx/sites-available/bookstack
+	ln -s /etc/nginx/sites-available/bookstack.conf /etc/nginx/sites-enabled/
+
+
+	systemctl stop nginx.service
+	systemctl start nginx.service
+	systemctl enable nginx.service
+
 }
 
 postinstall_ESGI_work(){
