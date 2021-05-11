@@ -521,6 +521,26 @@ EOF
 	
 }
 
+
+chroot_default_user(){
+	##########################################################
+	#							 #
+	#		Chroot user 				 #
+	#							 #
+	##########################################################
+	# Param1 : user créé à l'installation 
+
+	user=$1
+        apps="/usr/bin/mount /usr/bin/bash /usr/sbin/cryptsetup"	
+	mkdir /home/CHROOT
+
+	for app in $apps; do 
+		rsync -Ra $app /home/CHROOT/$app
+	done
+	#mkdir /home/CHROOT
+
+}
+
 install_nginx(){
 	apt install nginx -y
 
@@ -601,5 +621,6 @@ postinstall_ESGI_work(){
 	reboot 	
 }
 
-postinstall_ESGI_work
+#postinstall_ESGI_work
 #print_header
+chroot_default_user ""
