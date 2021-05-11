@@ -529,26 +529,58 @@ chroot_default_user(){
 	#							 #
 	##########################################################
 	# Param1 : user créé à l'installation 
-
 	user=$1
-        apps="/usr/bin/mount /usr/bin/bash /usr/sbin/cryptsetup"	
-
 	mkdir /home/CHROOT
-	chmod 755 /home/CHROOT
+	cd /home/CHROOT
+	rsync -Ra /usr/{bin,lib64,lib}/ /home/CHROOT
 
-	for app in $apps; do 
-		rsync -Ra $app /home/CHROOT
-		echo "`ldd $app`"
-	done
+	ln -s usr/bin/ bin
+	ln -s usr/lib lib
+	ln -s usr/lib64 lib64
+
+	rsync -Ra /home/$user/ /home/CHROOT/
+	rsync -Ra /dev/{null,zero,tty*} /home/CHROOT/
+	rsync -Ra /etc/{passwd,shadow} /home/CHROOT/
+
+
+	cd dev/
+	ln -s /dev/stdin 
+	ln -s /dev/stdout
+	ln -s /dev/sterr
+
+
+	touch /home/CHROOT/home/mathieu/.profile
+cat >> /home/CHROOT/home/mathieu/.profile << EOF
+# ~/.profile: executed by Bourne-compatible login shells.
+
+if [ "$BASH" ]; then
+  if [ -f /home/yonix/.bashrc ]; then
+    . ~/.bashrc
+  fi
+fi
+
+mesg n || true
+
+
+EOF
+
+
+cat >> /etc/ssh/sshd_config << EOF
+Match User $user
+        ChrootDirectory /home/CHROOT
+  
+
+EOF
+	systemctl restart ssh
+
 
 }
-
 install_nginx(){
 	apt install nginx -y
 
 	systemctl stop nginx.service
 	systemctl start nginx.service
-	systemctl enable gninx.service
+	systemctl enable nginx.service
 }
 
 install_mariadb(){
@@ -562,13 +594,9 @@ install_mariadb(){
 }
 
 install_php(){
-	version=7.1
-	apt install -y software-properties-common
-	add-apt-repository ppa:ondrej/php
+	version=7.3
 
-	apt update -y
-
-	apt install php$version-fpm
+	apt install php$version-fpm php$version-mbstring php$version-curl php$version-mysql php$version-gd php-tokenizer -y
 }
 
 postinstall_ESGI_work(){
@@ -625,4 +653,4 @@ postinstall_ESGI_work(){
 
 #postinstall_ESGI_work
 #print_header
-chroot_default_user ""
+chroot_default_user mathieu
