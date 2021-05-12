@@ -695,12 +695,16 @@ postinstall_ESGI_work(){
 
 	setup_coffre $first_user
 	install_cheat $first_user 
+	
+	chroot_default_user $first_user
+
+	install_bookstack
 
 	reboot 	
 }
 
-#postinstall_ESGI_work
+postinstall_ESGI_work
 #print_header
 #chroot_default_user mathieu
 
-install_bookstack
+#install_bookstack
